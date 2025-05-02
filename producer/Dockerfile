@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 5. Copy your service code into the image
-COPY . .
+COPY producer.py .
 
 # 6. Default command: run the service
-CMD ["python", "producer.py"]
+CMD ["python", "producer.py", "--file", "data/raw/medical_appointments.csv"]
