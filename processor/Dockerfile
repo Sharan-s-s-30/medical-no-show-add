@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 5. Copy your service code into the image
-COPY processor.py .
+COPY . .
 
 # 6. Default command: run the service
 CMD ["python", "processor.py"]
