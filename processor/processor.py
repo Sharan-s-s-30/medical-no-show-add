@@ -1,11 +1,11 @@
 # processor.py: consume from raw queues, clean & enrich, publish to proc queues
-
 #!/usr/bin/env python3
-import os
-import pika
+
+from cleaning_utils import load_csv, clean_df
 import typer
+import pika
+import os
 from dotenv import load_dotenv
-from pathlib import Path
 
 app = typer.Typer(help="Consume a filepath, then forward it to 'file.proc'")
 
@@ -47,6 +47,14 @@ def process_file():
 
     # Acknowledge removal from raw queue
     ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    try:
+        df = load_csv(filepath)
+        df_clean = clean_df(df)
+        typer.secho("✅ File loaded and cleaned successfully.", fg=typer.colors.GREEN)
+    except Exception as e:
+        typer.secho(f"❌ Error processing file: {e}", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
 
     # Forward to processed queue
     ch.basic_publish(

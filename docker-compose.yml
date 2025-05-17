@@ -23,7 +23,11 @@ services:
       - ./data:/app/data:ro
 
   processor:
-    build: ./processor
+    build:
+      context: ./processor
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data:ro
     env_file: .env
     depends_on: [rabbitmq]
 
