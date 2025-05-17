@@ -1,6 +1,7 @@
 # cleaning_utils.py: functions to parse dates, fix ages, map booleans, etc.
 import pandas as pd
 from datetime import datetime
+from io import BytesIO
 
 def load_csv(path: str) -> pd.DataFrame:
     """
@@ -8,6 +9,16 @@ def load_csv(path: str) -> pd.DataFrame:
     """
     df = pd.read_csv(path)
     return df
+
+def load_csv_from_bytes(raw_bytes: bytes) -> pd.DataFrame:
+    """
+    Load CSV content from raw bytes into a pandas DataFrame.
+    Uses BytesIO so no disk I/O is required.
+    """
+    buffer = BytesIO(raw_bytes)
+    df = pd.read_csv(buffer)
+    return df
+
 
 def parse_dates(df: pd.DataFrame,
                 sched_col: str = "ScheduledDay",
