@@ -1,8 +1,7 @@
-
 services:
   rabbitmq:
     image: rabbitmq:3-management
-    ports: ["5672:5672","15672:15672"]
+    ports: ["5672:5672", "15672:15672"]
 
   postgres:
     image: postgres:15
@@ -10,14 +9,17 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASS}
       POSTGRES_DB: ${POSTGRES_DB}
-    volumes: ["pgdata:/var/lib/postgresql/data"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
 
   producer:
     build: ./producer
     env_file: .env
     depends_on: [rabbitmq]
     volumes:
-      # mount the entire data folder into /app/data inside the container
       - ./data:/app/data:ro
 
   processor:
