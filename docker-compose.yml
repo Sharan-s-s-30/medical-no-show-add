@@ -36,5 +36,12 @@ services:
     env_file: .env
     depends_on: [rabbitmq, postgres]
 
+  trainer:
+    build:
+      context: .
+      dockerfile: trainer/Dockerfile
+    env_file: .env
+    depends_on:
+      - postgres
 volumes:
   pgdata:

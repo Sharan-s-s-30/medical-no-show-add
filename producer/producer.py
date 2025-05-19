@@ -1,31 +1,28 @@
-"""
-1) Read data/raw/noshowappointments.csv
-2) Split into train/test/val
-3) Publish JSON rows to raw.train/test/val queues
-"""
 #!/usr/bin/env python3
+# producer.py: read a CSV, compress & encode it, and broadcast to all downstream consumers via a fanout exchange
+
 from pathlib import Path
 import json
+import gzip
+import base64
 import pika
 import typer
 from dotenv import load_dotenv
-from typing import Optional
 import os
-import gzip
-import base64
 
-app = typer.Typer(help="Publish a CSV filepath to RabbitMQ")
+app = typer.Typer(help="Publish a compressed CSV batch to RabbitMQ for both raw ingestion and processing")
 
 def get_channel() -> pika.BlockingConnection.channel:
     """Connect to RabbitMQ and return a channel."""
     load_dotenv()  # reads .env in working dir
+    creds = pika.PlainCredentials(
+        os.getenv("RABBITMQ_USER", "guest"),
+        os.getenv("RABBITMQ_PASS", "guest"),
+    )
     params = pika.ConnectionParameters(
         host=os.getenv("RABBITMQ_HOST", "rabbitmq"),
         port=int(os.getenv("RABBITMQ_PORT", 5672)),
-        credentials=pika.PlainCredentials(
-            os.getenv("RABBITMQ_USER", "guest"),
-            os.getenv("RABBITMQ_PASS", "guest"),
-        )
+        credentials=creds,
     )
     conn = pika.BlockingConnection(params)
     return conn.channel()
@@ -35,21 +32,21 @@ def produce(
     file: Path = typer.Option(..., exists=True, help="Path to your raw CSV file")
 ):
     """
-    Compress & Base64-encode the entire CSV, then publish as JSON to 'file.raw'.
+    1. Read the entire CSV into memory
+    2. Compress with gzip and Base64-encode
+    3. Broadcast the envelope JSON to the 'raw_data' fanout exchange
     """
     ch = get_channel()
-    ch.queue_declare(queue="file.raw", durable=True)
 
-    # 1. Read the file bytes
+    # 1. Declare a fanout exchange for raw data
+    ch.exchange_declare(exchange="raw_data", exchange_type="fanout", durable=True)
+
+    # 2. Read & compress the CSV
     raw_bytes = file.read_bytes()
-
-    # 2. Compress with gzip
     comp_bytes = gzip.compress(raw_bytes)
+    b64_str = base64.b64encode(comp_bytes).decode("utf-8")
 
-    # 3. Base64-encode to get a text-safe payload
-    b64_str = base64.b64encode(comp_bytes).decode('utf-8')
-
-    # 4. Build the JSON envelope
+    # 3. Build the JSON envelope
     payload = {
         "type": "compressed_csv",
         "filename": file.name,
@@ -57,15 +54,14 @@ def produce(
     }
     body = json.dumps(payload)
 
-    # 5. Publish
+    # 4. Publish to the exchange (fanout => all bound queues get it)
     ch.basic_publish(
-        exchange="",
-        routing_key="file.raw",
+        exchange="raw_data",
+        routing_key="",  # ignored by fanout
         body=body,
         properties=pika.BasicProperties(delivery_mode=2),
     )
-    typer.echo(f"📤 Published compressed CSV '{file.name}' to 'file.raw'")
-
+    typer.echo(f"📤 Broadcast compressed CSV '{file.name}' to exchange 'raw_data'")
 
 if __name__ == "__main__":
     app()

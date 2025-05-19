@@ -11,7 +11,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 5. Copy your service code into the image
-COPY uploader.py .
+COPY . ./uploader
 
 # 6. Default command: run the service
-CMD ["python", "uploader.py"]
+CMD ["python", "-m", "uploader.uploader"]
+
