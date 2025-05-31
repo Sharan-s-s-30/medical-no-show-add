@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medical No-Show Dashboard</title>
+  <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+  <h1>Medical Appointments Dashboard</h1>
+  <section id="processed-view">
+    <h2>Processed Appointments</h2>
+    <button id="load-processed">Load 50 Rows</button>
+    <table id="processed-table">
+      <thead>
+        <tr>
+          <th>Appointment ID</th>
+          <th>Age</th>
+          <th>Wait Days</th>
+          <th>Scheduled Hour</th>
+          <th>Weekday</th>
+          <th>Gender</th>
+          <th>Neighbourhood</th>
+          <th>Age Group</th>
+          <th>No-Show?</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </section>
+  <section id="test-view">
+    <h2>Provide the Input and Predict</h2>
+    <form id="custom-form">
+      <label>Age: <input type="number" name="age" required /></label><br />
+      <label>Wait Days: <input type="number" name="wait_days" required /></label><br />
+      <label>Scheduled Hour: <input type="number" name="scheduled_hour" required min="0" max="23" /></label><br />
+      <label>Appointment Weekday: <input type="number" name="appointment_weekday" required min="0" max="6" /></label><br />
+      <label>Gender: <input type="text" name="gender" required /></label><br />
+      <label>Neighbourhood: <input type="text" name="neighbourhood" required /></label><br />
+      <label>Age Group: <input type="text" name="age_group" required /></label><br />
+      <button type="submit">Predict</button>
+    </form>
+    <div id="custom-prediction-result" class="prediction-box"></div>
+  </section>
+  <script src="main.js"></script>
+</body>
+</html>

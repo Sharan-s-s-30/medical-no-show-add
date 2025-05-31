@@ -14,7 +14,15 @@ model = joblib.load("models/no_show_model.joblib")
 load_dotenv()
 engine = create_engine(os.getenv("DATABASE_URL"))
 app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class FeatureRow(BaseModel):
     age: int
     wait_days: int

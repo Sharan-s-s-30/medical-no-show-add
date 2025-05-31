@@ -54,5 +54,15 @@ services:
     depends_on:
       - postgres
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"
+    env_file: .env
+    depends_on:
+      - model_server
+
 volumes:
   pgdata:
