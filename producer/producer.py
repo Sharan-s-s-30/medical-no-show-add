@@ -29,24 +29,20 @@ def get_channel() -> pika.BlockingConnection.channel:
 
 @app.command()
 def produce(
-    file: Path = typer.Option(..., exists=True, help="Path to your raw CSV file")
+    file: Path = typer.Option(..., exists=True, help="Path to raw CSV file")
 ):
-    """
-    1. Read the entire CSV into memory
-    2. Compress with gzip and Base64-encode
-    3. Broadcast the envelope JSON to the 'raw_data' fanout exchange
-    """
+    """Compresses a local CSV file and publishes it to the 'raw_data' RabbitMQ exchange."""
     ch = get_channel()
 
-    # 1. Declare a fanout exchange for raw data
+    # declare a fanout exchange for raw data
     ch.exchange_declare(exchange="raw_data", exchange_type="fanout", durable=True)
 
-    # 2. Read & compress the CSV
+    # read the CSV and compress it with gzip, then Base64-encode
     raw_bytes = file.read_bytes()
     comp_bytes = gzip.compress(raw_bytes)
     b64_str = base64.b64encode(comp_bytes).decode("utf-8")
 
-    # 3. Build the JSON envelope
+    # build the message payload
     payload = {
         "type": "compressed_csv",
         "filename": file.name,
@@ -54,14 +50,14 @@ def produce(
     }
     body = json.dumps(payload)
 
-    # 4. Publish to the exchange (fanout => all bound queues get it)
+    # publish the message to the exchange (fanout sends to all bound queues)
     ch.basic_publish(
         exchange="raw_data",
-        routing_key="",  # ignored by fanout
+        routing_key="",  # not used in fanout
         body=body,
         properties=pika.BasicProperties(delivery_mode=2),
     )
-    typer.echo(f"📤 Broadcast compressed CSV '{file.name}' to exchange 'raw_data'")
+    typer.echo(f"Broadcast compressed CSV '{file.name}' to exchange 'raw_data'")
 
 if __name__ == "__main__":
     app()
