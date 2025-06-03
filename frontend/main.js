@@ -24,48 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tbody.appendChild(tr);
       }
     });
-  // View 2: Random Case + Predict
-  let currentCase = null;
 
-  const randomBtn = document.getElementById("load-random");
-  const predictBtn = document.getElementById("predict-btn");
-
-  if (randomBtn && predictBtn) {
-    randomBtn.addEventListener("click", async () => {
-      const res = await fetch(`${API}/test-data/random`);
-      currentCase = await res.json();
-      const container = document.getElementById("case-data");
-      container.innerHTML = "";
-      for (const [k, v] of Object.entries(currentCase)) {
-        const div = document.createElement("div");
-        div.textContent = `${k}: ${v}`;
-        container.appendChild(div);
-      }
-      predictBtn.disabled = false;
-      document.getElementById("prediction-result").textContent = "";
-    });
-
-    predictBtn.addEventListener("click", async () => {
-      if (!currentCase) return;
-      const payload = {
-        age: currentCase.age,
-        wait_days: currentCase.wait_days,
-        scheduled_hour: new Date(currentCase.scheduled_day).getHours(),
-        appointment_weekday: new Date(currentCase.appointment_day).getDay(),
-        gender: currentCase.gender,
-        neighbourhood: currentCase.neighbourhood,
-        age_group: currentCase.age_group
-      };
-      const res = await fetch(`${API}/predict`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const [{ prediction }] = await res.json();
-      document.getElementById("prediction-result").textContent =
-        `Predicted No-Show Probability: ${(prediction * 100).toFixed(1)}%`;
-    });
-  }
   // View 3: Custom Input Prediction
   const customForm = document.getElementById("custom-form");
 
