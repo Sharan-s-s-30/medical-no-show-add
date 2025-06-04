@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Medical No-Show Dashboard</title>
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>Medical Appointments Dashboard</h1>
+
+  <!-- View 1: Processed Data Table -->
   <section id="processed-view">
     <h2>Processed Appointments</h2>
     <button id="load-processed">Load 50 Rows</button>
@@ -25,23 +27,22 @@
         </tr>
       </thead>
       <tbody>
+        <!-- rows injected here -->
       </tbody>
     </table>
   </section>
+
+  <!-- View 2: Random Case + Predict -->
   <section id="test-view">
-    <h2>Provide the Input and Predict</h2>
-    <form id="custom-form">
-      <label>Age: <input type="number" name="age" required /></label><br />
-      <label>Wait Days: <input type="number" name="wait_days" required /></label><br />
-      <label>Scheduled Hour: <input type="number" name="scheduled_hour" required min="0" max="23" /></label><br />
-      <label>Appointment Weekday: <input type="number" name="appointment_weekday" required min="0" max="6" /></label><br />
-      <label>Gender: <input type="text" name="gender" required /></label><br />
-      <label>Neighbourhood: <input type="text" name="neighbourhood" required /></label><br />
-      <label>Age Group: <input type="text" name="age_group" required /></label><br />
-      <button type="submit">Predict</button>
-    </form>
-    <div id="custom-prediction-result" class="prediction-box"></div>
+    <h2>Test a Random Case</h2>
+    <button id="load-random">Load Random Case</button>
+    <div id="case-data">
+      <!-- case fields injected here -->
+    </div>
+    <button id="predict-btn" disabled>Predict No-Show Risk</button>
+    <div id="prediction-result" class="prediction-box"></div>
   </section>
+
   <script src="main.js"></script>
 </body>
 </html>
