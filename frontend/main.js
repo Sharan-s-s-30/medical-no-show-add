@@ -1,7 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API = "/api";
+  const tableView = document.getElementById("processed-view");
+  const testView = document.getElementById("test-view");
 
-  // View 1: Processed Data Table
+  const navTable = document.getElementById("nav-table");
+  const navTest = document.getElementById("nav-test");
+
+  const showView = (view) => {
+    [tableView, testView].forEach((section) =>
+      section.classList.remove("active")
+    );
+    view.classList.add("active");
+  };
+
+  showView(tableView);
+
+  navTable.addEventListener("click", () => showView(tableView));
+  navTest.addEventListener("click", () => showView(testView));
+
+  //Processed Data Table
   document.getElementById("load-processed")
     .addEventListener("click", async () => {
       try {
@@ -32,8 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-  // View 2: Random Case + Predict
-    let currentCase = null;
+  //Random Case + Predict
+  let currentCase = null;
 
   document.getElementById("load-random")
     .addEventListener("click", async () => {
@@ -73,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(payload)
       });
 
-      const result = await res.json(); // can be array or object depending on backend
+      const result = await res.json();
       const prediction = result.prediction ?? result[0]?.prediction;
 
       document.getElementById("prediction-result").textContent =

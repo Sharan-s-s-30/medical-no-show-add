@@ -1,19 +1,43 @@
 body {
   font-family: sans-serif;
   margin: 2rem;
-  background-color: #001f3f; /* dark navy blue */
-  color: #ffffff; /* white text */
+  background-color: #001f3f;
+  color: #ffffff;
+}
+
+nav {
+  margin-bottom: 2rem;
+}
+
+nav button {
+  margin-right: 1rem;
+  background-color: #004080;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+nav button:hover {
+  background-color: #0066cc;
 }
 
 section {
   margin-bottom: 3rem;
+  display: none;
+}
+
+section.active {
+  display: block;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 0.5rem;
-  background-color: #003366; /* slightly lighter than body */
+  background-color: #003366;
   color: white;
 }
 
@@ -24,6 +48,7 @@ th, td {
 }
 
 button {
+  margin-top: 0.5rem;
   margin-right: 1rem;
   background-color: #0074D9;
   color: white;
@@ -58,5 +83,3 @@ button:hover {
   max-width: 500px;
   border-radius: 4px;
 }
-
-/* Removed input styles, since you're not using them anymore */

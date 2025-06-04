@@ -7,8 +7,10 @@
 </head>
 <body>
   <h1>Medical Appointments Dashboard</h1>
-
-  <!-- View 1: Processed Data Table -->
+  <nav>
+    <button id="nav-table">Processed Table</button>
+    <button id="nav-test">Test Random Case</button>
+  </nav>
   <section id="processed-view">
     <h2>Processed Appointments</h2>
     <button id="load-processed">Load 50 Rows</button>
@@ -27,22 +29,17 @@
         </tr>
       </thead>
       <tbody>
-        <!-- rows injected here -->
       </tbody>
     </table>
   </section>
-
-  <!-- View 2: Random Case + Predict -->
   <section id="test-view">
     <h2>Test a Random Case</h2>
     <button id="load-random">Load Random Case</button>
     <div id="case-data">
-      <!-- case fields injected here -->
     </div>
     <button id="predict-btn" disabled>Predict No-Show Risk</button>
     <div id="prediction-result" class="prediction-box"></div>
   </section>
-
   <script src="main.js"></script>
 </body>
 </html>
