@@ -24,6 +24,14 @@ nav button:hover {
   background-color: #0066cc;
 }
 
+hr.divider {
+  border: none;
+  height: 2px;
+  background-color: #66ccff;
+  margin: 1rem 0 2rem;
+  border-radius: 2px;
+}
+
 section {
   margin-bottom: 3rem;
   display: none;
@@ -83,3 +91,9 @@ button:hover {
   max-width: 500px;
   border-radius: 4px;
 }
+
+table thead tr {
+  background-color: #004d99;
+  color: white;
+}
+

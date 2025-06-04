@@ -11,6 +11,7 @@
     <button id="nav-table">Processed Table</button>
     <button id="nav-test">Test Random Case</button>
   </nav>
+  <hr class="divider">
   <section id="processed-view">
     <h2>Processed Appointments</h2>
     <button id="load-processed">Load 50 Rows</button>
@@ -35,8 +36,22 @@
   <section id="test-view">
     <h2>Test a Random Case</h2>
     <button id="load-random">Load Random Case</button>
-    <div id="case-data">
-    </div>
+    <table id="case-table">
+  <thead>
+    <tr>
+      <th>Appointment ID</th>
+      <th>Age</th>
+      <th>Wait Days</th>
+      <th>Scheduled Hour</th>
+      <th>Weekday</th>
+      <th>Gender</th>
+      <th>Neighbourhood</th>
+      <th>Age Group</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
     <button id="predict-btn" disabled>Predict No-Show Risk</button>
     <div id="prediction-result" class="prediction-box"></div>
   </section>

@@ -57,14 +57,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${API}/test-data/random`);
       currentCase = await res.json();
 
-      const container = document.getElementById("case-data");
-      container.innerHTML = "";
+      const caseTableBody = document.querySelector("#case-table tbody");
+      caseTableBody.innerHTML = ""; // Clear previous
 
-      for (const [key, value] of Object.entries(currentCase)) {
-        const div = document.createElement("div");
-        div.textContent = `${key}: ${value}`;
-        container.appendChild(div);
-      }
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${currentCase.appointment_id}</td>
+        <td>${currentCase.age}</td>
+        <td>${currentCase.wait_days}</td>
+        <td>${currentCase.scheduled_hour}</td>
+        <td>${currentCase.appointment_weekday}</td>
+        <td>${currentCase.gender}</td>
+        <td>${currentCase.neighbourhood}</td>
+        <td>${currentCase.age_group}</td>
+`      ;
+      caseTableBody.appendChild(tr);
+
 
       document.getElementById("predict-btn").disabled = false;
       document.getElementById("prediction-result").textContent = "";
