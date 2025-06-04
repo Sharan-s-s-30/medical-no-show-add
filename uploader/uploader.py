@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from uploader.db_utils import insert_rows
 
 
-app = typer.Typer(help="Upload raw and processed CSVs from RabbitMQ into Postgres in bulk")
+app = typer.Typer(help="Upload raw and processed CSVs from RabbitMQ into Postgres")
 
 def get_channel() -> pika.BlockingConnection.channel:
     load_dotenv()
@@ -60,10 +60,6 @@ def upload_raw():
     6. Acknowledge and exit
     """
     ch = get_channel()
-    # ensure exchange & queue, then bind
-    ch.exchange_declare(exchange="raw_data", exchange_type="fanout", durable=True)
-    ch.queue_declare(queue="file.raw_ingest", durable=True)
-    ch.queue_bind(queue="file.raw_ingest", exchange="raw_data")
 
     method, props, body = ch.basic_get(queue="file.raw_ingest", auto_ack=False)
     if method is None:
@@ -113,12 +109,12 @@ def upload_raw():
 
     # bulk insert
     rows = df.to_dict("records")
-    typer.secho(f"📊 Bulk inserting {len(rows)} raw rows…", fg=typer.colors.YELLOW)
+    typer.secho(f"Inserting {len(rows)} raw rows…", fg=typer.colors.YELLOW)
     insert_rows("raw_appointments", rows)
 
     # ack & exit
     ch.basic_ack(delivery_tag=method.delivery_tag)
-    typer.secho("✅ Raw rows inserted; exiting.", fg=typer.colors.BLUE)
+    typer.secho(" Raw data inserted; exiting.", fg=typer.colors.BLUE)
 
 @app.command("upload")
 def upload_processed():
@@ -130,18 +126,17 @@ def upload_processed():
     5. Acknowledge and exit
     """
     ch = get_channel()
-    ch.queue_declare(queue="file.proc", durable=True)
 
     method, props, body = ch.basic_get(queue="file.proc", auto_ack=False)
     if method is None:
-        typer.secho("⚠️  'file.proc' is empty", fg=typer.colors.RED)
+        typer.secho("'file.proc' is empty", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
     # parse envelope
     msg = json.loads(body)
     data_b64 = msg["data_b64"]
     filename = msg.get("filename", "<unknown>")
-    typer.secho(f"📥 Processed ingest received: {filename}", fg=typer.colors.GREEN)
+    typer.secho(f"Processed ingest received: {filename}", fg=typer.colors.GREEN)
 
     # decode & decompress
     comp = base64.b64decode(data_b64)
@@ -149,16 +144,16 @@ def upload_processed():
 
     # load
     df = pd.read_csv(BytesIO(csv_bytes))
-    typer.secho(f"✅ Loaded {len(df)} cleaned rows", fg=typer.colors.GREEN)
+    typer.secho(f"Loaded {len(df)} cleaned rows", fg=typer.colors.GREEN)
 
     # bulk insert
     rows = df.to_dict("records")
-    typer.secho(f"📊 Bulk inserting {len(rows)} processed rows…", fg=typer.colors.YELLOW)
+    typer.secho(f"Inserting {len(rows)} processed rows…", fg=typer.colors.YELLOW)
     insert_rows("processed_appointments", rows)
 
     # ack & exit
     ch.basic_ack(delivery_tag=method.delivery_tag)
-    typer.secho("✅ Processed rows inserted; exiting.", fg=typer.colors.BLUE)
+    typer.secho("Processed rows inserted.", fg=typer.colors.BLUE)
 
 if __name__ == "__main__":
     app()

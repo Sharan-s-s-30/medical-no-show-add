@@ -34,8 +34,6 @@ def produce(
     """Compresses a local CSV file and publishes it to the 'raw_data' RabbitMQ exchange."""
     ch = get_channel()
 
-    # declare a fanout exchange for raw data
-    ch.exchange_declare(exchange="raw_data", exchange_type="fanout", durable=True)
 
     # read the CSV and compress it with gzip, then Base64-encode
     raw_bytes = file.read_bytes()
