@@ -1,18 +1,18 @@
-# 1. Base image with Python runtime
+
 FROM python:3.11-slim
 
-# 2. Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# 3. Copy only the requirements first (cache-friendly)
+# Copy requirements
 COPY requirements.txt .
 
-# 4. Install dependencies
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5. Copy your service code into the image
+# Copy code
 COPY . ./uploader
 
-# 6. Default command: run the service
+# Default command to run
 CMD ["python", "-m", "uploader.uploader"]
 

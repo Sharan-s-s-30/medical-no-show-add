@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import joblib
 import pandas as pd
@@ -11,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sqlalchemy import create_engine
 
 def main():
-    # 1) Load env & connect
+    # Load env & connect
     load_dotenv()
     user = os.getenv("POSTGRES_USER", "ml_user")
     pwd  = os.getenv("POSTGRES_PASS", "")
@@ -21,16 +20,16 @@ def main():
     uri  = f"postgresql://{user}:{pwd}@{host}:{port}/{db}"
     engine = create_engine(uri)
 
-    # 2) Pull the processed table
+    # SELECT the processed table
     df = pd.read_sql("SELECT * FROM processed_appointments", engine)
     print(f"Loaded {len(df)} rows from processed_appointments")
 
-    # 3) Split into train / temp (train 70%, temp 30%)
+    # Split into train / temp (train 70%, temp 30%)
     train_df, temp_df = train_test_split(df, train_size=0.7, random_state=42, stratify=df["no_show"])
-    #    then split temp into validation & test (each 50% of temp → 15% each of total)
+    # Split further into validation & test
     val_df, test_df  = train_test_split(temp_df, train_size=2/3, random_state=42, stratify=temp_df["no_show"])
 
-    # 8) Push test_df into Postgres for later use
+    # Push test_df into Postgres for later use
     print(f"Writing {len(test_df)} test rows back to Postgres…")
     test_df.to_sql(
         "test_appointments",
@@ -38,13 +37,13 @@ def main():
         if_exists="replace",
         index=False,
     )
-    print("✅ test_appointments table updated.")
+    print("test_appointments table updated.")
 
     print(f"Train: {len(train_df)}, Val: {len(val_df)}, Test: {len(test_df)}")
 
-    # 4) Features & target
+    # Features & target
     target = "no_show"
-    # numeric cols we engineered
+    # numeric cols
     num_feats = ["age", "wait_days", "scheduled_hour", "appointment_weekday"]
     # categorical
     cat_feats = ["gender", "neighbourhood", "age_group"]
@@ -52,7 +51,7 @@ def main():
     X_train = train_df[num_feats + cat_feats]
     y_train = train_df[target]
 
-    # 5) Build pipeline
+    # Build pipeline
     preprocessor = ColumnTransformer([
         ("num", StandardScaler(), num_feats),
         ("cat", OneHotEncoder(handle_unknown="ignore"), cat_feats),
@@ -63,11 +62,11 @@ def main():
         ("lr", LogisticRegression(max_iter=1000)),
     ])
 
-    # 6) Fit
+    # Fit
     print("Training model…")
     clf.fit(X_train, y_train)
 
-    # 7) Persist
+    # Save
     os.makedirs("models", exist_ok=True)
     path = os.path.join("models", "no_show_model.joblib")
     joblib.dump(clf, path)

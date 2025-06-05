@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # processor.py: consume compressed CSV from 'raw_data' exchange via queue 'file.raw',
 # clean it, re-compress & re-publish to 'file.proc'
 
@@ -11,10 +10,9 @@ import os
 from dotenv import load_dotenv
 from cleaning_utils import load_csv_from_bytes, clean_df
 
-app = typer.Typer(help="Consume a compressed CSV from 'raw_data', clean it, and forward to 'file.proc'")
+app = typer.Typer(help="Consume a  CSV from 'raw_data', clean it, and forward to 'file.proc'")
 
 def get_channel() -> pika.BlockingConnection.channel:
-    """Establishes and returns a RabbitMQ channel using environment variables."""
     load_dotenv()
     creds = pika.PlainCredentials(
         os.getenv("RABBITMQ_USER", "guest"),
@@ -30,19 +28,10 @@ def get_channel() -> pika.BlockingConnection.channel:
 
 @app.command("process-file")
 def process_file():
-    """Processes one raw CSV message from RabbitMQ and forwards the cleaned result."""
 
     ch = get_channel()
 
-    # declare exchange & queue, bind them
-    ch.exchange_declare(exchange="raw_data", exchange_type="fanout", durable=True)
-    ch.queue_declare(queue="file.raw", durable=True)
-    ch.queue_bind(queue="file.raw", exchange="raw_data")
-
-    # make sure that processed queue exists
-    ch.queue_declare(queue="file.proc", durable=True)
-
-    # pull one message
+    # pull a message
     method, props, body = ch.basic_get(queue="file.raw", auto_ack=False)
     if method is None:
         typer.secho("'file.raw' is empty")

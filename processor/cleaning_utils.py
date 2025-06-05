@@ -57,7 +57,7 @@ def normalize_neighborhood(df: pd.DataFrame,
     return df
 
 def convert_flags(df):
-    # numeric flags (0/1) → bool
+    # numeric flags (0/1) -> bool
     for c in ["scholarship","hypertension","diabetes","alcoholism","sms_received"]:
         df[c] = df[c].astype(bool)
 
@@ -79,6 +79,9 @@ def compute_wait_days(df: pd.DataFrame,
                       new_col: str = "wait_days") -> pd.DataFrame:
     """Days between scheduling and appointment."""
     df[new_col] = (df[app_col] - df[sched_col]).dt.days
+    
+    # Drop rows with negative wait days
+    df = df[df[new_col] >= 0].copy()
     return df
 
 def compute_scheduled_hour(df: pd.DataFrame,

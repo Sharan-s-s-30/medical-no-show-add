@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+
 from processor.cleaning_utils import load_csv, clean_df
 
 df = load_csv("data/raw/medical_appointments.csv")
