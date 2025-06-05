@@ -1,6 +1,6 @@
 -- migrations/schema.sql
 
--- 1) Raw appointments: store exactly the original CSV columns (no derived features)
+-- 1) Raw appointments: store exactly the original CSV columns
 CREATE TABLE IF NOT EXISTS raw_appointments (
   patient_id       BIGINT       NOT NULL,
   appointment_id   BIGINT       PRIMARY KEY,
@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS processed_appointments (
   age_group            VARCHAR(20)    -- e.g. "child", "adult", "senior"
 );
 
+-- 3) For test data
 CREATE TABLE IF NOT EXISTS test_appointments (
   LIKE processed_appointments INCLUDING ALL
 );

@@ -9,9 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_conn():
-    """
-    Establish and return a new Postgres connection using env vars.
-    """
+    # establish connection
     return psycopg2.connect(
         host=os.getenv("POSTGRES_HOST", "postgres"),
         port=os.getenv("POSTGRES_PORT", "5432"),
@@ -22,9 +20,7 @@ def get_conn():
 
 
 def ping() -> bool:
-    """
-    Return True if we can connect and run a simple SELECT 1.
-    """
+    # test conn
     try:
         conn = get_conn()
         with conn.cursor() as cur:
@@ -57,10 +53,7 @@ def ping() -> bool:
 #         conn.close()
 
 def insert_rows(table: str, rows: list[dict]) -> None:
-    """
-    Bulk‐insert a list of dicts into `table` in a single query.
-    Uses psycopg2.extras.execute_values for maximum speed.
-    """
+    # bulk insert
     if not rows:
         return
 
@@ -68,20 +61,14 @@ def insert_rows(table: str, rows: list[dict]) -> None:
     try:
         with conn.cursor() as cur:
             cols = list(rows[0].keys())
-            # build the base INSERT statement
             stmt = f"INSERT INTO {table} ({', '.join(cols)}) VALUES %s"
-            # gather the tuples of values
             values = [[row[col] for col in cols] for row in rows]
-            # execute_values does a single INSERT with all rows
             execute_values(cur, stmt, values)
         conn.commit()
     finally:
         conn.close()
 
 def fetch_table(table: str) -> list:
-    """
-    Fetch all rows from the given table as a list of dicts.
-    """
     conn = get_conn()
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
