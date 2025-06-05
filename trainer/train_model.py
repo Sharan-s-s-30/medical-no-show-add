@@ -37,7 +37,7 @@ def main():
         if_exists="replace",
         index=False,
     )
-    print("✅ test_appointments table updated.")
+    print("test_appointments table updated.")
 
     print(f"Train: {len(train_df)}, Val: {len(val_df)}, Test: {len(test_df)}")
 
