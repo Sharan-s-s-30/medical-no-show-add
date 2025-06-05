@@ -103,7 +103,7 @@ def upload_raw():
 
     # ack & exit
     ch.basic_ack(delivery_tag=method.delivery_tag)
-    typer.secho(" Raw data inserted; exiting.")
+    typer.secho("Raw data inserted; exiting.")
 
 @app.command("upload")
 def upload_processed():
